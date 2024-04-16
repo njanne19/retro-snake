@@ -1,33 +1,35 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect } from 'react'
+import { GUI } from 'dat.gui'; 
+import SceneInit from './three/SceneInit';
+import SnakeGame from './three/SnakeGame';
 
 function App() {
-  const [count, setCount] = useState(0)
+  useEffect(() => {
+    const scene = new SceneInit('myThreeJsCanvas'); 
+    scene.initScene(); 
+    scene.animate(); 
 
+    // Then create the snake game and add it to the scene 
+    const snakeGame = new SnakeGame();
+    scene.attachGroup(snakeGame.boardGroup); 
+
+    // Add the settings GUI on top of the window 
+    const gui = new GUI(); 
+
+
+    const animate = (t : number) => {
+      requestAnimationFrame(animate);
+    };
+    animate(performance.now());
+
+  })
+  
   return (
     <>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <canvas id="myThreeJsCanvas"></canvas>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      
     </>
   )
 }
