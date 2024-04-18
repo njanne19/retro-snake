@@ -32,7 +32,7 @@ export default class SceneInit {
             1000
         )
         this.camera.lookAt(0, 0, 0);
-        this.camera.position.z = 10; 
+        this.camera.position.z = 15; 
 
         const canvas = document.getElementById(this.canvasID) as HTMLCanvasElement;
 
@@ -55,9 +55,9 @@ export default class SceneInit {
         window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
         // Render a grid to see what's going on (temporary)
-        const gridHelper = new THREE.GridHelper(10, 10);
-        gridHelper.rotation.x = Math.PI / 2;
-        this.scene.add(gridHelper);
+        // const gridHelper = new THREE.GridHelper(10, 10);
+        // gridHelper.rotation.x = Math.PI / 2;
+        // this.scene.add(gridHelper);
 
     }
 
