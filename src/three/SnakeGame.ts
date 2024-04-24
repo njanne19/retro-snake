@@ -5,6 +5,7 @@ export default class SnakeGame {
     // Three JS Groups 
     boardGroup: THREE.Group;
     snakeGroup: THREE.Group; 
+    snackGroup: THREE.Group; 
     tweenTimeStep: number; 
     lastTime: number;
 
@@ -33,6 +34,8 @@ export default class SnakeGame {
         this.resetBoard(); 
         this.snakeGroup = new THREE.Group(); 
         this.resetSnake(); 
+        this.snackGroup = new THREE.Group(); 
+        this.resetSnack(); 
     }
 
     loop(t : number) {
@@ -60,9 +63,8 @@ export default class SnakeGame {
         for (let i = startIndex; i <= endIndex; i++) { 
             for (let j = startIndex; j <= endIndex; j++) { 
                 const geometry = new THREE.BoxGeometry(1, 1, 1);
-                const wireframeGeometry = new THREE.WireframeGeometry(geometry);
-                const material = new THREE.LineBasicMaterial({color: '#0CFF00'});
-                const wireframe = new THREE.LineSegments(wireframeGeometry, material);
+                const material = new THREE.MeshNormalMaterial({wireframe: true});  
+                const wireframe = new THREE.LineSegments(geometry, material);
                 wireframe.position.set(i, j, 0);
                 this.boardGroup.add(wireframe);
             }
@@ -102,8 +104,8 @@ export default class SnakeGame {
 
         while(remainingSnakePieces > 0) { 
             // Create the piece 
-            const geometry = new THREE.BoxGeometry(1, 1, 1); 
-            const material = new THREE.MeshBasicMaterial({color: '#FF0000'});
+           const geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9); 
+            const material = new THREE.MeshBasicMaterial({color: '#70db49'});
             const cube = new THREE.Mesh(geometry, material); 
             cube.position.set(bodyPieceX, bodyPieceY, 0);
             this.snakeGroup.add(cube);
@@ -152,6 +154,41 @@ export default class SnakeGame {
             remainingSnakePieces -= 1;
 
         }
+    }
+
+    resetSnack() { 
+        // Find where the snack is on the snack map, delete it, and regenerate it
+        // We will regenerate the snack at a random location on the board
+        // We will also regenerate the snack if it is on the snake
+        this.snackGroup.clear();
+        this.snackMap = this.createEmptyMap();
+
+        // Generate a random position on the board
+        let snackX = Math.floor(Math.random() * this.gridSize) - this.unsignedBoardBound;
+        let snackY = Math.floor(Math.random() * this.gridSize) - this.unsignedBoardBound;
+        let [snackI, snackJ] = this.globalToMapCoords(snackX, snackY); 
+       
+        // Check if there is collisions
+        while (this.snakeMap[snackI][snackJ]) { 
+            snackX = Math.floor(Math.random() * this.gridSize) - this.unsignedBoardBound;
+            snackY = Math.floor(Math.random() * this.gridSize) - this.unsignedBoardBound;
+            [snackI, snackJ] = this.globalToMapCoords(snackX, snackY);
+        }
+
+        // Create the snack
+        const geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+        const material = new THREE.MeshBasicMaterial({color: '#eb3434'});
+        const snack = new THREE.Mesh(geometry, material);
+        snack.position.set(snackX, snackY, 0);
+
+        // Add the snack to the snack group
+        this.snackGroup.add(snack);
+
+        // Add the snack to the snack map
+        console.log("Snack is at ", snackX, snackY)
+        const [mapI, mapJ] = this.globalToMapCoords(snackX, snackY);
+        this.snackMap[mapI][mapJ] = true;
+
     }
 
     // Generates an empty map given the current grid size

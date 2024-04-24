@@ -54,6 +54,17 @@ export default class SceneInit {
         // Add window resize event listener
         window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
+        // // Add some ambient lighting 
+        let ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        ambientLight.castShadow = true;
+        this.scene.add(ambientLight);
+
+        // // spot light which is illuminating the chart directly
+        let spotLight = new THREE.SpotLight(0xffffff, 0.5);
+        spotLight.castShadow = true;
+        spotLight.position.set(0, 8, 48);
+        this.scene.add(spotLight);
+
         // Render a grid to see what's going on (temporary)
         // const gridHelper = new THREE.GridHelper(10, 10);
         // gridHelper.rotation.x = Math.PI / 2;
