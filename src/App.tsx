@@ -39,6 +39,7 @@ function App() {
 
 
     const animate = (t : number) => {
+      snakeGame.loop(t);
       requestAnimationFrame(animate);
     };
     animate(performance.now());

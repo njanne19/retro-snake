@@ -1,9 +1,12 @@
 import * as THREE from 'three';
+import * as TWEEN from '@tweenjs/tween.js';
 
 export default class SnakeGame { 
     // Three JS Groups 
     boardGroup: THREE.Group;
     snakeGroup: THREE.Group; 
+    tweenTimeStep: number; 
+    lastTime: number;
 
     // Default Parameters 
     gridSize: number;
@@ -22,11 +25,22 @@ export default class SnakeGame {
         this.gridSize = 9;
         this.snakeStartLength = 15; 
 
+        // Animation params 
+        this.tweenTimeStep = 250; 
+
         // Create the board group 
         this.boardGroup = new THREE.Group();
         this.resetBoard(); 
         this.snakeGroup = new THREE.Group(); 
         this.resetSnake(); 
+    }
+
+    loop(t : number) {
+        TWEEN.update(t);
+        const timeStep = t - this.lastTime; 
+        if (timeStep > this.tweenTimeStep) { 
+            this.lastTime = t; 
+        }
     }
 
     clearBoard() { 
@@ -233,7 +247,9 @@ export default class SnakeGame {
                 this.snakeMap[tailMapI][tailMapJ] = false;
             }
 
-            currentPiece.position.set(nextPositionX, nextPositionY, 0);
+        
+            //currentPiece.position.set(nextPositionX, nextPositionY, 0);
+            this.animateSnakePieceMovement(currentPiece, nextPositionX, nextPositionY); 
             
             // Remap next position 
             nextPositionX = tempX;
@@ -241,5 +257,29 @@ export default class SnakeGame {
         }
     }
 
+    animateSnakePieceMovement(snakePiece : THREE.Mesh, nextPositionX : number, nextPositionY : number) { 
+        // Animate the movement of a single snake piece to a new position 
+        // This function is a primitive that will move the snake in the given direction.
+        
+        // Get the current position of the head and perturb it
+        const currentPositionX = snakePiece.position.x;
+        const currentPositionY = snakePiece.position.y;
+
+        // Animate the movement of the snake piece
+        const tween = new TWEEN.Tween({
+            x: currentPositionX,
+            y: currentPositionY
+        })
+        .to({
+            x: nextPositionX,
+            y: nextPositionY
+        }, this.tweenTimeStep)
+        .easing(TWEEN.Easing.Sinusoidal.Out)
+        .onUpdate(({ x, y }) => {
+            snakePiece.position.set(x, y, 0);
+        });
+
+        tween.start(); 
+    }
 
 }
